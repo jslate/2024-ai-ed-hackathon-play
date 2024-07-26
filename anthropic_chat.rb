@@ -10,9 +10,10 @@ require 'active_support/all'
 class AnthropicChat
   attr_reader :messages
 
-  def initialize(debug: false)
+  def initialize(debug: false, system_messages: [])
     @messages = []
     @debug = debug
+    @system_messages = system_messages
   end
 
   def ask(template_key: nil, message: nil, schema: nil,  **merge_vars)
@@ -50,7 +51,7 @@ class AnthropicChat
   end
 
   def add_system_messages(messages_array)
-    add_messages(messages_array, 'system')
+    @system_messages << messages_array
   end
 
   def add_messages(messages_array, role)
@@ -72,6 +73,7 @@ class AnthropicChat
         model_id: 'anthropic.claude-3-5-sonnet-20240620-v1:0',
         content_type: 'application/json',
         body: {
+          system: @system_messages.join(', '),
           messages: message_array,
           anthropic_version: 'bedrock-2023-05-31',
           max_tokens: 50_000,

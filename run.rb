@@ -13,19 +13,27 @@ debug = ARGV[0].nil? ? false : ARGV[0].downcase == 'debug'
 
 chat = AnthropicChat.new(debug:)
 
+chat.add_system_messages <<~MSG
+  This chat should be about Harry Potter and the Methods or Rationality. Keep gently
+  steering the conversation back to that topic.
+MSG
+
 name = chat.ask(template_key: :hello, name: 'Jon', schema: { name: 'string' })['name']
-output "#{name} says hello!"
+output "Hello, #{name}!"
 
-response = chat.ask(message: "What's your favorite color, #{name}? Just pretend you do have one!")
-output response
-
+round = 0
 loop do
   print "Prompt: (type 'exit' to quit) "
   user_input = gets.chomp
   break if user_input.downcase == 'exit'
 
-  response = chat.ask(message: user_input)
-  output response
+  if round % 4 == 0
+
+  else
+    response = chat.ask(message: user_input)
+    output response
+  end
+  round += 1
 end
 
 puts 'Goodbye!'
