@@ -25,11 +25,15 @@ class AnthropicChat
       prompt = Mustache.render(llm_template, **merge_vars)
     end
 
-    prompt += "Please format your response according to the following schema: #{schema.to_json}" if schema.present?
+    if schema.present?
+      prompt += "Please format your response according to the following schema: #{schema.to_json}"
+    else
+      prompt += "Please respond in natural language."
+    end
 
     add_user_messages(prompt)
     response = chat(@messages, has_schema: schema.present?)
-    add_assistant_messages(response)
+    add_assistant_messages(response.to_s)
     response
   end
 
@@ -58,9 +62,6 @@ class AnthropicChat
 
   def chat(messages, has_schema: false)
     message_array = messages.map { |m| { role: m[:role], content: m[:content] } }
-
-    # debugger
-
     if @debug
       puts
       puts JSON.pretty_generate(message_array)
